@@ -68,7 +68,10 @@ class LoRa:
         LongRangeMode = 0b1
         # Choose LoRa (instead of FSK) mode for SX1276 and put the module in sleep mode
         self.write('RegOpMode', self.Mode['SLEEP'] | LongRangeMode << 7) 
-        # Test read function 
+        # Test read function
+        print(self.read('RegOpMode'))
+        print(self.Mode['SLEEP'])
+        print(LongRangeMode) 
         assert self.read('RegOpMode') == (self.Mode['SLEEP'] | LongRangeMode << 7), "LoRa initialization failed"
          
         # Set modem config: bandwidth, coding rate, header mode, spreading factor, CRC, and etc.  
