@@ -6,15 +6,18 @@ import RPi.GPIO as GPIO
 class LoRa:
     def __init__(self, RST_Pin, CS_Pin, SPI_CH, SCK_Pin, MOSI_Pin, MISO_Pin, DIO0_Pin, plus20dBm=False):
         # Set up GPIO
+        self.RST_Pin = RST_Pin
+        self.CS_Pin = CS_Pin
+        self.DIO0_Pin = DIO0_Pin
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(RST_Pin, GPIO.OUT)
-        GPIO.setup(CS_Pin, GPIO.OUT)
-        GPIO.setup(DIO0_Pin, GPIO.IN)
+        GPIO.setup(self.RST_Pin, GPIO.OUT)
+        GPIO.setup(self.CS_Pin, GPIO.OUT)
+        GPIO.setup(self.DIO0_Pin, GPIO.IN)
 
         # Reset LoRa Module
-        GPIO.output(RST_Pin, GPIO.LOW)
+        GPIO.output(self.RST_Pin, GPIO.LOW)
         time.sleep(0.01)
-        GPIO.output(RST_Pin, GPIO.HIGH)
+        GPIO.output(self.RST_Pin, GPIO.HIGH)
         time.sleep(0.01)
 
         # Initialize SPI
@@ -136,19 +139,19 @@ class LoRa:
         else:
             raise ValueError("Data must be int or str")
         
-        GPIO.output(CS_Pin, GPIO.LOW)  # Enable communication
+        GPIO.output(self.CS_Pin, GPIO.LOW)  # Enable communication
         self.spi.xfer(data)
-        GPIO.output(CS_Pin, GPIO.HIGH)  # Release the bus
+        GPIO.output(self.CS_Pin, GPIO.HIGH)  # Release the bus
 
     def read(self, reg=None, length=1):
-        GPIO.output(CS_Pin, GPIO.LOW)
+        GPIO.output(self.CS_Pin, GPIO.LOW)
         if length == 1:
             data = self.spi.xfer([self.RegTable[reg], 0x00])
             result = data[1]
         else:
             data = self.spi.xfer([self.RegTable[reg]] + [0x00] * length)
             result = data[1:]
-        GPIO.output(CS_Pin, GPIO.HIGH)
+        GPIO.output(self.CS_Pin, GPIO.HIGH)
         return result
 
     def _irq_handler(self, channel):
